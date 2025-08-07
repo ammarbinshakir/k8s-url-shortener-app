@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: url-shortener-backend
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: backend
@@ -12,6 +12,15 @@ spec:
       labels:
         app: backend
     spec:
+      initContainers:
+        - name: wait-for-postgres
+          image: postgres:15
+          command:
+            [
+              "sh",
+              "-c",
+              "until pg_isready -h postgres -p 5432; do sleep 2; done;",
+            ]
       containers:
         - name: backend
           image: ammarbinshakir/url-shortener-backend:latest
